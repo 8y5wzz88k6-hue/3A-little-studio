@@ -1,0 +1,4 @@
+.godot/
+source/intermediate/
+source/*.log
+*.blend1
