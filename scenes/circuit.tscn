@@ -1,0 +1,106 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/harbor.scn" id="1"]
+[ext_resource type="PackedScene" path="res://assets/Kestrel_R9.glb" id="2"]
+[ext_resource type="Script" path="res://scripts/circuit.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/instruments.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/wet_street.gd" id="5"]
+[ext_resource type="Shader" path="res://shaders/harbor_sky.gdshader" id="6"]
+[ext_resource type="Texture2D" path="res://assets/harbor_radiance.exr" id="7"]
+[ext_resource type="Script" path="res://scripts/driver_seat.gd" id="8"]
+
+[sub_resource type="ShaderMaterial" id="SkyMat"]
+shader = ExtResource("6")
+shader_parameter/street_panorama = ExtResource("7")
+
+[sub_resource type="Sky" id="Sky"]
+radiance_size = 4
+sky_material = SubResource("SkyMat")
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 2
+sky = SubResource("Sky")
+ambient_light_source = 2
+ambient_light_color = Color(0.65, 0.72, 0.87, 1)
+ambient_light_energy = 0.43
+ambient_light_sky_contribution = 0.45
+reflected_light_source = 2
+tonemap_mode = 3
+ssr_enabled = true
+ssr_max_steps = 56
+glow_enabled = true
+glow_intensity = 0.89
+glow_bloom = 0.10
+glow_hdr_threshold = 0.87
+ssao_enabled = true
+ssao_radius = 1.15
+ssao_intensity = 1.25
+fog_enabled = true
+fog_light_color = Color(0.22, 0.18, 0.35, 1)
+fog_light_energy = 0.73
+fog_density = 0.0063
+fog_sky_affect = 0.35
+
+[node name="Tideline" type="Node3D"]
+script = ExtResource("3")
+
+[node name="Atmosphere" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="BlueHour" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-52, -38, 0)
+light_color = Color(0.75, 0.81, 0.98, 1)
+light_energy = 0.46
+shadow_enabled = true
+directional_shadow_max_distance = 95.0
+
+[node name="District" parent="." instance=ExtResource("1")]
+
+[node name="StreetOptics" type="Node3D" parent="."]
+script = ExtResource("5")
+
+[node name="Kestrel" type="Node3D" parent="."]
+position = Vector3(0, 0.035, 102)
+
+[node name="Body" parent="Kestrel" instance=ExtResource("2")]
+
+[node name="DriverSeat" type="Node3D" parent="Kestrel"]
+script = ExtResource("8")
+
+[node name="Headlights" type="SpotLight3D" parent="Kestrel"]
+position = Vector3(0, 0.61, -1.91)
+rotation_degrees = Vector3(-7, 0, 0)
+light_color = Color(0.76, 0.92, 1, 1)
+light_energy = 7.0
+spot_range = 26.0
+spot_angle = 40.0
+spot_attenuation = 0.85
+
+[node name="TailGlow" type="OmniLight3D" parent="Kestrel"]
+position = Vector3(0, 0.65, 2.55)
+light_color = Color(1, 0.07, 0.025, 1)
+light_energy = 0.58
+light_specular = 0.09
+omni_range = 4.0
+
+[node name="Chase" type="Camera3D" parent="."]
+position = Vector3(0, 2.6, 109)
+rotation_degrees = Vector3(-7, 0, 0)
+fov = 70.0
+far = 510.0
+current = true
+
+[node name="Motor" type="AudioStreamPlayer" parent="."]
+volume_db = -23.0
+
+[node name="Overlay" type="CanvasLayer" parent="."]
+
+[node name="Instruments" type="Control" parent="Overlay"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4")
